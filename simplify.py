@@ -1,5 +1,5 @@
 user_sub_action = open("user_sub_action.txt", "w", encoding="UTF-8")
-user_sub_profile_keyword = open("user_sub_profile_keyword.txt", "w", encoding="UTF-8")
+user_sub_attribute = open("user_sub_attribute.txt", "w", encoding="UTF-8")
 
 uid = set()
 uid_edge = set()
@@ -34,7 +34,7 @@ def del_unused_keyword(s):
     global uid
     temp = s.split("\t", 1)
     if temp[0] in uid:
-        user_sub_profile_keyword.write(uid_profile[temp[0]] + "\t" + temp[1])
+        user_sub_attribute.write(uid_profile[temp[0]] + "\t" + temp[1])
 
 
 for line in open("user_action.txt", encoding='UTF-8'):
@@ -50,3 +50,5 @@ for line in open("user_key_word.txt", encoding='UTF-8'):
     del_unused_keyword(line)
 
 del uid, uid_edge, uid_profile
+user_sub_action.close()
+user_sub_attribute.close()
