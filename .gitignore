@@ -1,10 +1,3 @@
 #Floder
 venv
-#file
-user_action.txt
-user_profile.txt
-user_key_word.txt
-user_sub_action.txt
-user_sub_attribute.txt
-action.txt
-attribute.txt
+data

@@ -6,17 +6,19 @@ succession_uid = dict()
 user_sub_action = open("user_sub_action.txt", "w", encoding="UTF-8")
 user_sub_attribute = open("user_sub_attribute.txt", "w", encoding="UTF-8")
 
-# delete edges which two nodes of the edge are same
+# delete edges which two nodes of the edge are same and the weight of the edge between two nodes is 0
 user_action = open("user_action.txt", "r", encoding='UTF-8')
 for line in user_action:
     temp = line.split("\t", 4)
-    if temp[0] != temp[1]:
+    weight = int(temp[2]) + int(temp[3]) + int(temp[4])
+    if temp[0] != temp[1] and weight != 0:
         uid_edge.add((temp[0], temp[1]))
 user_action.close()
 
-# delete on way edge and the node of the edge
+# delete one way edge and write two nodes and the weight if the edge to file
 user_action = open("user_action.txt", "r", encoding='UTF-8')
 for line in user_action:
+    line.rstrip()
     temp = line.split("\t", 4)
     if (temp[1], temp[0]) in uid_edge:
         uid.add(temp[0])
@@ -53,14 +55,6 @@ for id_ in uid_:
     succession_uid[id_] = index
     index = index + 1
 
-action = open("action.txt", "w", encoding="UTF-8")
-user_sub_action = open("user_sub_action.txt", "r", encoding='UTF-8')
-for line in user_sub_action:
-    temp = line.split("\t", 2)
-    action.write(str(succession_uid[temp[0]]) + "\t" + str(succession_uid[temp[1]]) + "\t" + temp[2])
-user_sub_action.close()
-action.close()
-
 attribute = open("attribute.txt", "w", encoding="UTF-8")
 user_sub_attribute = open("user_sub_attribute.txt", "r", encoding='UTF-8')
 for line in user_sub_attribute:
@@ -68,3 +62,25 @@ for line in user_sub_attribute:
     attribute.write(str(succession_uid[temp[0]]) + "\t" + temp[1])
 user_sub_attribute.close()
 attribute.close()
+
+action_ = open("action_.txt", "w", encoding="UTF-8")
+user_sub_action = open("user_sub_action_.txt", "r", encoding='UTF-8')
+for line in user_sub_action:
+    temp = line.split("\t", 2)
+    action_.write(str(succession_uid[temp[0]]) + "\t" + str(succession_uid[temp[1]]) + "\t" + temp[2])
+user_sub_action.close()
+action_.close()
+
+edge = dict()
+action = open("action.txt", "w", encoding="UTF-8")
+action_ = open("action_.txt", "r", encoding='UTF-8')
+for line in action_:
+    line.rstrip()
+    temp = line.split("\t", 2)
+    if (temp[1], temp[0]) in edge:
+        weight = int(temp[2]) + edge[(temp[1], temp[0])]
+        action.write(temp[0] + "\t" + temp[1] + "\t" + str(weight) + "\n")
+    else:
+        edge[(temp[0], temp[1])] = int(temp[2])
+action_.close()
+action.close()
