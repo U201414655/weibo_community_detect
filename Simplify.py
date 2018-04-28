@@ -1,3 +1,5 @@
+import os
+
 uid = set()
 uid_edge = set()
 uid_profile = dict()
@@ -58,7 +60,6 @@ for line in user_key_word:
         user_sub_attribute.write(uid_profile[temp[0]] + "\t" + temp[1])
 user_key_word.close()
 
-
 user_sub_attribute.close()
 
 index = 0
@@ -88,4 +89,7 @@ for line in user_sub_action:
 user_sub_action.close()
 action_.close()
 
-
+os.remove("data/action_.txt")
+os.remove("data/user_sub_action.txt")
+os.remove("data/user_sub_action_.txt")
+os.remove("data/user_sub_attribute.txt")
