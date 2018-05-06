@@ -5,16 +5,16 @@ class Louvain():
     def __init__(self, edge_path, node_path):
         self.edges = self.load_edges_file(edge_path)
         self.nodes = self.load_nodes_file(node_path)
-        self.all_sum_weight = 0
-        self.node_sum_weight = [0 for n in self.nodes]
+        self.W = 0
+        self.L_i = [0 for n in self.nodes]
         self.node_weight = [0 for n in self.nodes]
         self.edges_of_node = {}
         self.communities = [n for n in self.nodes]
         self.final_communities = []
         for e in self.edges:
-            self.all_sum_weight += e[1]
-            self.node_sum_weight[e[0][0]] += e[1]
-            self.node_sum_weight[e[0][1]] += e[1]
+            self.W += e[1]
+            self.L_i[e[0][0]] += e[1]
+            self.L_i[e[0][1]] += e[1]
             if e[0][0] not in self.edges_of_node:
                 self.edges_of_node[e[0][0]] = [e]
             else:
