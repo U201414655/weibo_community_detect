@@ -10,15 +10,14 @@ user_action = open("data/user_action.txt", "r", encoding='UTF-8')
 user_sub_action = open("data/user_sub_action.txt", "w", encoding="UTF-8")
 for line in user_action:
     temp = line.split("\t", 4)
-    if temp[0] != temp[1]:
-        weight = int(temp[2]) * 3 + int(temp[3]) * 2 + int(temp[4])
-        if (temp[1], temp[0]) in uid_edge:
-            uid.add(temp[0])
-            uid.add(temp[1])
-            user_sub_action.write(temp[1] + "\t" + temp[0] + "\t" + str(weight + uid_edge[(temp[1], temp[0])]) + "\n")
-            del uid_edge[(temp[1], temp[0])]
-        else:
-            uid_edge[(temp[0], temp[1])] = weight
+    weight = int(temp[2]) * 3 + int(temp[3]) * 2 + int(temp[4])
+    if (temp[1], temp[0]) in uid_edge:
+        uid.add(temp[0])
+        uid.add(temp[1])
+        user_sub_action.write(temp[1] + "\t" + temp[0] + "\t" + str(weight + uid_edge[(temp[1], temp[0])]) + "\n")
+        del uid_edge[(temp[1], temp[0])]
+    else:
+        uid_edge[(temp[0], temp[1])] = weight
 user_action.close()
 user_sub_action.close()
 
