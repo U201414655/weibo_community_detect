@@ -8,7 +8,6 @@ class Louvain():
         self.w = 0
         self.L_i = [0 for n in self.nodes]
         self.L_i_in = [0 for n in self.nodes]
-        self.is_combined = [False for n in self.nodes]
         self.edges_of_node = {}
 
         for (e, w) in self.edges.items():
@@ -28,13 +27,21 @@ class Louvain():
         # s_tot:sum of the weights of the links incident to nodes in community
         self.s_in = [0 for node in self.nodes]
         self.s_tot = [self.L_i[node.id] for node in self.nodes]
+        self.communities = [n.id for n in self.nodes]
+        for (e, w) in self.edges.items():
+            if e[0] == e[1]:
+                self.s_in[e[0]] += 2 * w
 
     def load_edges_file(self, edge_path):
         edge_file = open(edge_path, "r", encoding="UTF-8")
         edges = {}
         for line in edge_file:
             e = line.split("\t", 2)
-            edges[(int(e[0]), int(e[1]))] = int(e[2])
+            n1 = int(e[0])
+            n2 = int(e[1])
+            if n1 > n2:
+                n1, n2 = n2, n1
+            edges[(n1, n2)] = int(e[2])
         edge_file.close()
         return edges
 
@@ -53,81 +60,109 @@ class Louvain():
             q = self.compute_modularity()
             print (q)
             if q == best_q:
-                return best_q
+                partition = [node.group for node in self.nodes if node.group]
+                return (best_q, partition)
+            self.rebuild_graph()
             best_q = q
-
-    def init_partition(self):
-        self.s_in = [self.s_in[node.id] if not self.is_combined[node.id] else 0 for node in self.nodes]
-        self.s_tot = [self.L_i[node.id] if not self.is_combined[node.id] else 0 for node in self.nodes]
-        for (e, w) in self.edges.items():
-            if e[0] == e[1]:
-                self.s_in[e[0]] += w
-                self.s_in[e[1]] += w
 
     def get_neighbors(self, id):
         for e in self.edges_of_node[id]:
-            if e[0] == e[0]:  # a node is not neighbor with itself
+            if e[0] == e[1]:  # a node is not neighbor with itself
                 continue
-            if e[0] == id:
+            elif e[0] == id:
                 yield e[1]
-            if e[1] == id:
+            else:
                 yield e[0]
 
     def first_phase(self):
-        self.init_partition()
+        current_node = [node for node in self.nodes if not node.is_combined]
         while True:
             improved = False
-            current_node = [node for node in self.nodes if not self.is_combined[node.id]]
             for node in current_node:
                 id = node.id
+                node_community = self.communities[id]
+                best_community = node_community
                 best_gain = 0
                 best_shared_links = 0
-                best_community = id
 
                 for e in self.edges_of_node[id]:
                     if e[0] == e[1]:
                         continue
-                    if e[0] == id and e[1] in self.nodes[id].group or e[1] == id and e[0] in self.nodes[id].group:
+                    if e[0] == id and self.communities[e[1]] == node_community:
                         best_shared_links += self.edges[e]
-                self.s_in[id] -= 2 * (best_shared_links + self.L_i_in[id])
-                self.s_tot[id] -= self.L_i[id]
+                    elif e[1] == id and self.communities[e[0]] == node_community:
+                        best_shared_links += self.edges[e]
+                self.s_in[node_community] -= 2 * (best_shared_links + self.L_i_in[id])
+                self.s_tot[node_community] -= self.L_i[id]
 
-                visited_neighbors = set()
+                visited_communities = set()
                 for neighbor in self.get_neighbors(id):
-                    if neighbor in visited_neighbors:
+                    neighbor_community = self.communities[neighbor]
+                    if neighbor_community in visited_communities:
                         continue
-                    visited_neighbors.add(neighbor)
+                    visited_communities.add(neighbor_community)
                     shared_links = 0
                     for e in self.edges_of_node[id]:
                         if e[0] == e[1]:
                             continue
-                        if e[0] == id and e[1] in self.nodes[neighbor].group or e[1] == id and e[0] in self.nodes[neighbor].group:
+                        if e[0] == id and self.communities[e[1]] == neighbor_community:
                             shared_links += self.edges[e]
-                    # compute modularity gain obtained by moving _node to the community of _neighbor
-                    gain = self.compute_modularity_gain(id, neighbor, shared_links)
+                        elif e[1] == id and self.communities[e[0]] == neighbor_community:
+                            shared_links += self.edges[e]
+                    # compute modularity gain obtained by moving node to the community of its neighbor
+                    gain = self.compute_modularity_gain(id, neighbor_community, shared_links)
                     # to-do
                     if gain > best_gain:
-                        best_community = neighbor
+                        best_community = neighbor_community
                         best_gain = gain
                         best_shared_links = shared_links
 
                 self.s_in[best_community] += 2 * (best_shared_links + self.L_i_in[id])
                 self.s_tot[best_community] += self.L_i[id]
-                if best_community != id:
-                    print (id)
-                    combine_nodes(best_community, id)
-                    combine_edges(best_community, id)
-                    self.is_combined[id] = True
+                self.communities[id] = best_community
+
+                if best_community != node_community:
+                    self.nodes[best_community].group.extend(self.nodes[id].group)
+                    self.nodes[id].group.clear()
+                    node.is_combined = True
                     improved = True
             if not improved:
                 return
 
-    def combine_nodes(self, best, id):
-        self.nodes[best].group.extend(self.nodes[id].group)
-        self.nodes[id].group.clear()
+    def rebuild_graph(self):
+        t_edges = {}
+        for (e, w) in self.edges.items():
+            n1 = self.communities[e[0]]
+            n2 = self.communities[e[1]]
+            if n1 > n2:
+                n1, n2 = n2, n1
+            try:
+                t_edges[(n1, n2)] += w
+            except KeyError:
+                t_edges[(n1, n2)] = w
+        self.edges = t_edges
+        self.edges_of_node = {}
+        self.L_i = [0 for n in self.nodes]
+        self.L_i_in = [0 for n in self.nodes]
+        for (e, w) in self.edges.items():
+            self.L_i[e[0]] += w
+            self.L_i[e[1]] += w
+            if e[0] not in self.edges_of_node:
+                self.edges_of_node[e[0]] = [e]
+            else:
+                self.edges_of_node[e[0]].append(e)
+            if e[1] not in self.edges_of_node:
+                self.edges_of_node[e[1]] = [e]
+            elif e[0] != e[1]:
+                self.edges_of_node[e[1]].append(e)
+        self.communities = [n.id for n in self.nodes]
 
-    def combine_edges(self, best, id):
-        pass
+        self.s_in = [0 for node in self.nodes]
+        self.s_tot = [self.L_i[node.id] for node in self.nodes]
+
+        for (e, w) in self.edges.items():
+            if e[0] == e[1]:
+                self.s_in[e[0]] += 2 * w
 
     def compute_modularity(self):
         q = 0

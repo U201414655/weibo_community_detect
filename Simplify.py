@@ -21,7 +21,6 @@ for line in user_action:
 user_action.close()
 user_sub_action.close()
 
-
 # load user profile to the dict
 user_profile = open("data/user_profile.txt", "r", encoding='UTF-8')
 for line in user_profile:
@@ -63,7 +62,11 @@ action = open("data/action.txt", "w", encoding="UTF-8")
 user_sub_action = open("data/user_sub_action.txt", "r", encoding='UTF-8')
 for line in user_sub_action:
     temp = line.split("\t", 2)
-    action.write(str(succession_uid[temp[0]]) + "\t" + str(succession_uid[temp[1]]) + "\t" + temp[2])
+    n1 = succession_uid[temp[0]]
+    n2 = succession_uid[temp[1]]
+    if n1 > n2:
+        n1, n2 = n2, n1
+    action.write(str(n1) + "\t" + str(n2) + "\t" + temp[2])
 user_sub_action.close()
 action.close()
 
