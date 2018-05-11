@@ -75,7 +75,7 @@ class Louvain():
                 yield e[0]
 
     def first_phase(self):
-        current_node = [node for node in self.nodes if not node.is_combined]
+        current_node = [node for node in self.nodes if not node.is_merged]
         while True:
             improved = False
             for node in current_node:
@@ -111,10 +111,12 @@ class Louvain():
                             shared_links += self.edges[e]
                     # compute modularity gain obtained by moving node to the community of its neighbor
                     gain = self.compute_modularity_gain(id, neighbor_community, shared_links)
-                    # to-do
-                    if gain > best_gain:
+
+                    node_similar = Lnode.are_nodes_similar(self.nodes[id], self.nodes[neighbor_community])
+
+                    if gain + node_similar > best_gain:
                         best_community = neighbor_community
-                        best_gain = gain
+                        best_gain = gain + node_similar
                         best_shared_links = shared_links
 
                 self.s_in[best_community] += 2 * (best_shared_links + self.L_i_in[id])
@@ -122,9 +124,7 @@ class Louvain():
                 self.communities[id] = best_community
 
                 if best_community != node_community:
-                    self.nodes[best_community].group.extend(self.nodes[id].group)
-                    self.nodes[id].group.clear()
-                    node.is_combined = True
+                    Lnode.merge_nodes(self.nodes[best_community], self.nodes[id])
                     improved = True
             if not improved:
                 return
