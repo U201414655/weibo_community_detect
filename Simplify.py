@@ -19,7 +19,7 @@ user_action.close()
 for (x, y) in uid_cnt.items():
     if y > 200:
         uid_select.add(x)
-#print(len(uid_select))
+# print(len(uid_select))
 
 uid_node = set()
 edge = {}
@@ -66,12 +66,18 @@ for line in user_profile:
         uid_profile[n] = temp[1].rstrip()
 user_profile.close()
 
-attribute = open("data/attribute.txt", "w", encoding="UTF-8")
+user = {}
 user_keyword = open("data/user_key_word.txt", "r", encoding='UTF-8')
 for line in user_keyword:
     temp = line.split("\t", 1)
     n = int(temp[0])
     if n in uid_node:
-        attribute.write(str(uid_order[n]) + "\t" + uid_profile[n] + "\t" + temp[1])
+        user[uid_order[n]] = str(uid_order[n]) + "\t" + uid_profile[n] + "\t" + temp[1]
 user_keyword.close()
+
+attribute = open("data/attribute.txt", "w", encoding="UTF-8")
+user_keys = list(user.keys())
+user_keys.sort()
+for k in user_keys:
+    attribute.write(user[k])
 attribute.close()
