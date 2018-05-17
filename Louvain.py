@@ -53,10 +53,11 @@ class Louvain():
         attribute_file.close()
         return nodes
 
-    def cluster(self):
+    def community_detect(self):
         best_q = -1
         while True:
-            self.first_phase()
+            print ("begin")
+            self.cluster()
             q = self.compute_modularity()
             print (q)
             if q == best_q:
@@ -64,6 +65,7 @@ class Louvain():
                 return (best_q, partition)
             self.rebuild_graph()
             best_q = q
+            print ("end")
 
     def get_neighbors(self, id):
         for e in self.edges_of_node[id]:
@@ -74,9 +76,12 @@ class Louvain():
             else:
                 yield e[0]
 
-    def first_phase(self):
+    def cluster(self):
         current_node = [node for node in self.nodes if not node.is_merged]
+        i = 0
         while True:
+            print (i)
+            i += 1
             improved = False
             for node in current_node:
                 id = node.id
