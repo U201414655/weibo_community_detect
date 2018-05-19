@@ -33,21 +33,29 @@ class Lnode():
 
         # is age of two nodes similar
         if lnode1.age == 0 or not lnode2.age == 0:
-            weight += 0.2
+            weight += 0.1
         else:
             age_diff = int(lnode1.age) - (lnode2.age)
-            if -3 < age_diff < 3:
+            if -2 < age_diff < 2:
                 weight += 0.2
-            elif -10 < age_diff < 10:
+            elif -4 < age_diff < 4:
+                weight += 0.15
+            elif -6 < age_diff < 6:
                 weight += 0.1
+            elif -8 < age_diff < 8:
+                weight += 0.05
 
         # is gender of two nodes similar
-        if -0.2 < lnode1.gender - lnode2.gender < 0.2:
+        if lnode1.gender == 0 or lnode2.gender == 0:
+            weight += 0.1
+        elif -0.1 < lnode1.gender - lnode2.gender < 0.1:
             weight += 0.2
-        elif -0.5 < lnode1.gender - lnode2.gender < 0.5:
+        elif -0.2 < lnode1.gender - lnode2.gender < 0.2:
+            weight += 0.15
+        elif -0.3 < lnode1.gender - lnode2.gender < 0.3:
             weight += 0.1
-        elif lnode1.gender == 0 or lnode2.gender == 0:
-            weight += 0.1
+        elif -0.4 < lnode1.gender - lnode2.gender < 0.4:
+            weight += 0.05
 
         # is tweet_number od two nodes similar
         if lnode1.tweet_number != 0 and lnode2.tweet_number != 0:
@@ -55,36 +63,23 @@ class Lnode():
             if tweet_number1 < tweet_number2:
                 tweet_number1, tweet_number2 = tweet_number2, tweet_number1
             times = tweet_number1 / tweet_number2
-            if times < 0.5:
+            if times < 1.2:
                 weight += 0.1
-            elif times < 1:
-                weight += 0.05
+            elif times < 2:
+                weight += 0.06
+            elif times < 5:
+                weight += 0.02
 
         # is tag of two nodes similar
-        min_set_len = len(lnode1.tags)
-        if len(lnode1.tags) > len(lnode2.tags):
-            min_set_len = len(lnode2.tags)
+        min_set_len = len(lnode1.tags) if len(lnode1.tags) <= len(lnode2.tags) else len(lnode2.tags)
         inter_set_len = len(lnode1.tags & lnode2.tags)
-
-        if inter_set_len > 0:
-            if inter_set_len == min_set_len:
-                weight += 0.3
-            elif inter_set_len >= min_set_len / 2:
-                weight += 0.2
-            else:
-                weight += 0.1
+        weight += (inter_set_len / min_set_len) * 0.3
 
         # are key words of two nodes similar
-        min_set_len = len(lnode1.key_words)
-        if len(lnode1.key_words) > len(lnode2.key_words):
-            min_set_len = len(lnode2.key_words)
+        min_set_len = len(lnode1.key_words) if len(lnode1.key_words) <= len(lnode2.key_words) else len(lnode2.key_words)
         inter_set_len = len(lnode1.key_words & lnode2.key_words)
+        weight += (inter_set_len / min_set_len) * 0.2
 
-        if inter_set_len > 0:
-            if inter_set_len >= min_set_len / 2:
-                weight += 0.1
-            else:
-                weight += 0.1
         return weight
 
     @staticmethod
