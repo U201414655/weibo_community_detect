@@ -17,12 +17,11 @@ for line in user_action:
 user_action.close()
 
 for (x, y) in uid_cnt.items():
-    if y > 200:
+    if y > 150:
         uid_select.add(x)
-# print(len(uid_select))
 
 uid_node = set()
-edge = {}
+edge_ = {}
 
 user_action = open("data/user_action.txt", "r", encoding='UTF-8')
 for line in user_action:
@@ -33,12 +32,33 @@ for line in user_action:
     if n1 > n2:
         n1, n2 = n2, n1
     if n1 in uid_select and n2 in uid_select:
-        uid_node.add(n1)
-        uid_node.add(n2)
-        if (n1, n2) in edge:
-            edge[(n1, n2)] += weight
+        if (n1, n2) in edge_:
+            edge_[(n1, n2)] += weight
         else:
-            edge[(n1, n2)] = weight
+            edge_[(n1, n2)] = weight
+user_action.close()
+
+num_of_node = {}
+
+for (e, w) in edge_.items():
+    if e[0] in num_of_node:
+        num_of_node[e[0]] += 1
+    else:
+        num_of_node[e[0]] = 1
+    if e[1] in num_of_node:
+        num_of_node[e[1]] += 1
+    else:
+        num_of_node[e[1]] = 1
+
+edge = {}
+for (e, w) in edge_.items():
+    if num_of_node[e[0]] > 40 and num_of_node[e[1]] > 40:
+        uid_node.add(e[0])
+        uid_node.add(e[1])
+        if (e[0], e[1]) in edge:
+            edge[(e[0], e[1])] += weight
+        else:
+            edge[(e[0], e[1])] = weight
 user_action.close()
 
 print(len(uid_node), len(edge))
