@@ -17,7 +17,7 @@ for line in user_action:
 user_action.close()
 
 for (x, y) in uid_cnt.items():
-    if y > 100:
+    if y > 200:
         uid_select.add(x)
 # print(len(uid_select))
 
