@@ -17,7 +17,7 @@ for line in user_action:
 user_action.close()
 
 for (x, y) in uid_cnt.items():
-    if y > 150:
+    if y > 300:
         uid_select.add(x)
 
 uid_node = set()
@@ -52,7 +52,7 @@ for (e, w) in edge_.items():
 
 edge = {}
 for (e, w) in edge_.items():
-    if num_of_node[e[0]] > 40 and num_of_node[e[1]] > 40:
+    if num_of_node[e[0]] > 100 and num_of_node[e[1]] > 100:
         uid_node.add(e[0])
         uid_node.add(e[1])
         if (e[0], e[1]) in edge:

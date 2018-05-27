@@ -36,13 +36,13 @@ class Lnode():
             weight += 0.1
         else:
             age_diff = int(lnode1.age) - (lnode2.age)
-            if -2 < age_diff < 2:
+            if -3 < age_diff < 3:
                 weight += 0.2
-            elif -4 < age_diff < 4:
+            elif -5 < age_diff < 5:
                 weight += 0.15
-            elif -6 < age_diff < 6:
+            elif -7 < age_diff < 7:
                 weight += 0.1
-            elif -8 < age_diff < 8:
+            elif -10 < age_diff < 10:
                 weight += 0.05
 
         # is gender of two nodes similar
@@ -66,9 +66,7 @@ class Lnode():
             if times < 1.2:
                 weight += 0.1
             elif times < 2:
-                weight += 0.06
-            elif times < 5:
-                weight += 0.02
+                weight += 0.05
 
         # is tag of two nodes similar
         min_set_len = len(lnode1.tags) if len(lnode1.tags) <= len(lnode2.tags) else len(lnode2.tags)

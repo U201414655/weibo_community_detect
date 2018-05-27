@@ -114,12 +114,20 @@ class Louvain():
                     # compute modularity gain obtained by moving node to the community of its neighbor
                     gain = self.compute_modularity_gain(id, neighbor_community, shared_links)
 
+
                     node_similar = Lnode.are_nodes_similar(self.nodes[id], self.nodes[neighbor_community])
 
                     if gain + node_similar > best_gain:
                         best_community = neighbor_community
                         best_gain = gain + node_similar
                         best_shared_links = shared_links
+                    """
+
+                    if gain > best_gain:
+                        best_community = neighbor_community
+                        best_gain = gain
+                        best_shared_links = shared_links
+                    """
 
                 self.s_in[best_community] += 2 * (best_shared_links + self.L_i_in[id])
                 self.s_tot[best_community] += self.L_i[id]
