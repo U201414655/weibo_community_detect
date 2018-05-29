@@ -81,11 +81,9 @@ class Lnode():
         return weight
 
     @staticmethod
-    def merge_nodes(lnode1, lnode2):
+    def merge_nodes_attribute(lnode1, lnode2):
         len1 = len(lnode1.group)
         len2 = len(lnode2.group)
-        if len1 + len2 == 0:
-            return
         lnode1.age = (lnode1.age * len1 + lnode2.age * len2) / (len1 + len2)
         lnode1.gender = (lnode1.gender * len1 + lnode2.gender * len2) / (len1 + len2)
         lnode1.tweet_number = (lnode1.tweet_number * len1 + lnode2.tweet_number * len2) / (len1 + len2)

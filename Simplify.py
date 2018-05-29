@@ -1,5 +1,7 @@
 uid_cnt = {}
 uid_select = set()
+L1=250
+L2=150
 
 user_action = open("data/user_action.txt", "r", encoding='UTF-8')
 for line in user_action:
@@ -17,7 +19,7 @@ for line in user_action:
 user_action.close()
 
 for (x, y) in uid_cnt.items():
-    if y > 300:
+    if y > L1:
         uid_select.add(x)
 
 uid_node = set()
@@ -52,13 +54,13 @@ for (e, w) in edge_.items():
 
 edge = {}
 for (e, w) in edge_.items():
-    if num_of_node[e[0]] > 100 and num_of_node[e[1]] > 100:
+    if num_of_node[e[0]] > L2 and num_of_node[e[1]] > L2:
         uid_node.add(e[0])
         uid_node.add(e[1])
-        if (e[0], e[1]) in edge:
-            edge[(e[0], e[1])] += weight
+        if e in edge:
+            edge[e] += w
         else:
-            edge[(e[0], e[1])] = weight
+            edge[e] = w
 user_action.close()
 
 print(len(uid_node), len(edge))

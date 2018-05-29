@@ -2,6 +2,9 @@ from Lnode import Lnode
 
 
 class Louvain():
+    #attribute = False
+    attribute = True
+
     def __init__(self, edge_path, node_path):
         self.nodes = self.load_nodes_file(node_path)
         self.edges = self.load_edges_file(edge_path)
@@ -64,6 +67,7 @@ class Louvain():
             if q == best_q:
                 partition = [node.group for node in self.nodes if node.group]
                 return (best_q, partition)
+            self.merge_nodes()
             self.rebuild_graph()
             best_q = q
 
@@ -114,30 +118,34 @@ class Louvain():
                     # compute modularity gain obtained by moving node to the community of its neighbor
                     gain = self.compute_modularity_gain(id, neighbor_community, shared_links)
 
+                    if self.attribute:
+                        node_similar = Lnode.are_nodes_similar(self.nodes[id], self.nodes[neighbor_community])
+                        if gain + node_similar > best_gain:
+                            best_community = neighbor_community
+                            best_gain = gain + node_similar
+                            best_shared_links = shared_links
 
-                    node_similar = Lnode.are_nodes_similar(self.nodes[id], self.nodes[neighbor_community])
-
-                    if gain + node_similar > best_gain:
-                        best_community = neighbor_community
-                        best_gain = gain + node_similar
-                        best_shared_links = shared_links
-                    """
-
-                    if gain > best_gain:
-                        best_community = neighbor_community
-                        best_gain = gain
-                        best_shared_links = shared_links
-                    """
+                    else:
+                        if gain > best_gain:
+                            best_community = neighbor_community
+                            best_gain = gain
+                            best_shared_links = shared_links
 
                 self.s_in[best_community] += 2 * (best_shared_links + self.L_i_in[id])
                 self.s_tot[best_community] += self.L_i[id]
                 self.communities[id] = best_community
 
                 if best_community != node_community:
-                    Lnode.merge_nodes(self.nodes[best_community], self.nodes[id])
                     improved = True
             if not improved:
                 return
+
+    def merge_nodes(self):
+        current_node = [node for node in self.nodes if not node.is_merged]
+        for n in current_node:
+            community = self.communities[n.id]
+            if community != n.id:
+                Lnode.merge_nodes_attribute(self.nodes[community], self.nodes[n.id])
 
     def rebuild_graph(self):
         t_edges = {}
