@@ -3,11 +3,11 @@ import csv
 action = open("data/action.txt", "r", encoding='UTF-8')
 csv_dege = open("data/edge.csv", 'w')
 csv_edge_write = csv.writer(csv_dege)
-csv_edge_write.writerow(["Source", "Target", "Weight","Type"])
+csv_edge_write.writerow(["Source", "Target", "Weight", "Type"])
 for line in action:
     # line.rstrip()
     temp = line.split("\t", 2)
-    t = [int(temp[0]), int(temp[1]), int(temp[2]),"undirected"]
+    t = [int(temp[0]), int(temp[1]), int(temp[2]), "undirected"]
     csv_edge_write.writerow(t)
 csv_dege.close()
 

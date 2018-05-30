@@ -1,7 +1,7 @@
 uid_cnt = {}
 uid_select = set()
-L1=250
-L2=150
+L1 = 250
+L2 = 150
 
 user_action = open("data/user_action.txt", "r", encoding='UTF-8')
 for line in user_action:
